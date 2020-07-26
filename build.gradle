@@ -1,6 +1,8 @@
 plugins {
     id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'java'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
 }
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -35,5 +37,37 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
+    }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    publications = ['maven']
+    publish = true
+
+    pkg {
+        repo = 'Loader'
+        name = 'bootstrap'
+        userOrg = 'sandboxpowered'
+        licenses = ['LGPL-3.0']
+        vcsUrl = 'https://github.com/sandboxpowered/bootstrap.git'
+        publicDownloadNumbers = true
+        githubRepo = 'sandboxpowered/bootstrap'
+        githubReleaseNotesFile = 'README.md'
+        version {
+            name = project.version
+            desc = ''
+            vcsTag = project.version
+            released  = new Date()
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact jar
+        }
     }
 }
