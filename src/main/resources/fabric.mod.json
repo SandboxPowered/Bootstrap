@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "sandbox-bootstrap",
+  "version": "${version}",
+  "name": "Sandbox Bootstrap",
+  "description": "Sandbox auto updater",
+  "authors": [
+    "SandboxPowered"
+  ],
+  "contact": {
+    "homepage": "https://sandboxpowered.org",
+    "sources": "https://github.com/SandboxPowered/Bootstrap"
+  },
+  "license": "LGPLv3",
+  "icon": "assets/sandbox/icon.png",
+  "environment": "*",
+  "mixins": [
+    "bootstrap.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.9"
+  },
+  "recommends": {
+  },
+  "suggests": {
+  },
+  "conflicts": {
+  },
+  "breaks": {
+  }
+}

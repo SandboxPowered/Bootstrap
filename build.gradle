@@ -1,15 +1,39 @@
 plugins {
+    id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'java'
 }
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
+def ENV = System.getenv()
 group 'org.sandboxpowered'
-archivesBaseName 'bootstrap'
-version '1.0-SNAPSHOT'
+archivesBaseName = 'bootstrap'
+def buildNumber = ENV.BUILD_NUMBER
+version = "$project.sandbox_version.${buildNumber ? (buildNumber) : "0"}"
 
 repositories {
     mavenCentral()
+    maven { url 'https://dl.bintray.com/sandboxpowered/API/' }
+    maven { url 'https://maven.sandboxpowered.org/' }
+}
+
+minecraft {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}"
+    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
 }
