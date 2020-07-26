@@ -8,7 +8,7 @@ def ENV = System.getenv()
 group 'org.sandboxpowered'
 archivesBaseName = 'bootstrap'
 def buildNumber = ENV.BUILD_NUMBER
-version = "$project.sandbox_version.${buildNumber ? (buildNumber) : "0"}"
+version = "$project.bootstrap_version.${buildNumber ? (buildNumber) : "0"}"
 
 repositories {
     mavenCentral()
