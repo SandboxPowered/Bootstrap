@@ -67,6 +67,7 @@ bintray {
 publishing {
     publications {
         maven(MavenPublication) {
+            artifact remapJar
             artifact jar
         }
     }
