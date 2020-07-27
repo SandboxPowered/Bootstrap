@@ -64,7 +64,7 @@ public class AutoUpdate {
         BufferedImage image;
         try {
             image = ImageIO.read(AutoUpdate.class.getResource("/banner.png"));
-            frame.setIconImage(ImageIO.read(AutoUpdate.class.getResourceAsStream("/icon.png")));
+            frame.setIconImage(ImageIO.read(AutoUpdate.class.getResource("/icon.png")));
         } catch (IOException e) {
             throw new RuntimeException("unable to read input stream", e);
         }
@@ -153,11 +153,11 @@ public class AutoUpdate {
         infoLogger.accept("Checking for updates");
         Path home;
         if (SystemUtils.IS_OS_WINDOWS) {
-            home = Paths.get(System.getenv("APPDATA"), ".sandbox/cache");
+            home = Paths.get(System.getenv("APPDATA"), ".sandbox/versions/");
         } else if (SystemUtils.IS_OS_MAC) {
-            home = Paths.get(System.getProperty("user.home"), "Local Settings/ApplicationData/.sandbox/cache");
+            home = Paths.get(System.getProperty("user.home"), "Local Settings/ApplicationData/.sandbox/versions/");
         } else if (SystemUtils.IS_OS_LINUX) {
-            home = Paths.get(System.getProperty("user.home"), ".sandbox/cache");
+            home = Paths.get(System.getProperty("user.home"), ".sandbox/versions/");
         } else {
             throw new IllegalArgumentException("Unsupported OS");
         }
@@ -194,7 +194,7 @@ public class AutoUpdate {
                 String url = String.format("%s%s/sandbox-fabric-%s.jar", DOWNLOAD_URL, v, v);
                 try {
                     infoLogger.accept("Downloading Sandbox v" + v + ".");
-                    if (!Files.exists(home)) Files.createDirectory(home);
+                    Files.createDirectories(home);
                     //Open connection and get download size
                     HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
                     long completeFileSize = httpConnection.getContentLength();
