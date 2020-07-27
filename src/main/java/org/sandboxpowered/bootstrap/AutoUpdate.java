@@ -15,12 +15,13 @@ import java.io.IOException;
 public class AutoUpdate {
 
     public static void updateServer() {
-        ProgressCallback progressCallback = (percentage, stage) -> {
+        ProgressCallback progressCallback = (bytesDownloaded, bytesTotal, stage) -> {
             switch (stage) {
                 case PREPARING:
                     System.out.print("[          ] 0%");
                     break;
                 case DOWNLOADING:
+                    int percentage = (int) (bytesDownloaded / (double) bytesTotal * 100.0);
                     if (percentage > 0) {
                         String progress = Strings.repeat("=", percentage / 10);
                         String left = Strings.repeat(" ", 10 - progress.length());
@@ -121,7 +122,7 @@ public class AutoUpdate {
         //    textLabel.setVisible(true);
         //};
 
-        ProgressCallback updateProgress = (percentage, stage) -> SwingUtilities.invokeLater(() -> {
+        ProgressCallback updateProgress = (bytesDownloaded, bytesTotal, stage) -> SwingUtilities.invokeLater(() -> {
             switch (stage) {
                 case PREPARING:
                     progressBar.setVisible(true);
@@ -129,6 +130,7 @@ public class AutoUpdate {
                     progressBar.setString("0%");
                     break;
                 case DOWNLOADING:
+                    int percentage = (int) (bytesDownloaded / (double) bytesTotal * 100.0);
                     progressBar.setValue(percentage);
                     progressBar.setString(percentage + "%");
                     break;

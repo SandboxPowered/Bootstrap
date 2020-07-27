@@ -40,26 +40,26 @@ public class DownloadManager {
                 //Open connection and get download size
                 URLConnection httpConnection = source.openConnection();
                 long bytesTotal = httpConnection.getContentLength();
-                progressCallback.accept(0, ProgressCallback.Stage.PREPARING);
+                progressCallback.accept(0, bytesTotal, ProgressCallback.Stage.PREPARING);
                 try (BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream()); BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(temp))) {
                     byte[] data = new byte[1024];
                     long bytesDownloaded = 0;
 
-                    //TODO maybe change buffer size to make progress bar smoother? or make it configurable?
+                    //TODO maybe change buffer size to make the progress bar smoother? or make it configurable?
                     int i;
                     while ((i = inputStream.read(data, 0, 1024)) >= 0) {
                         //Add data and update progress bar
                         bytesDownloaded += i;
-                        progressCallback.accept((int) (bytesDownloaded / (double) bytesTotal * 100.0), ProgressCallback.Stage.DOWNLOADING);
+                        progressCallback.accept(bytesDownloaded, bytesTotal, ProgressCallback.Stage.DOWNLOADING);
                         outputStream.write(data, 0, i);
                     }
-                    progressCallback.accept(100, ProgressCallback.Stage.COPYING);
+                    progressCallback.accept(bytesTotal, bytesTotal, ProgressCallback.Stage.COPYING);
                 }
                 Files.createDirectories(target.getParent());
                 try (InputStream inputStream = Files.newInputStream(temp, StandardOpenOption.DELETE_ON_CLOSE)) {
                     Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
                 }
-                progressCallback.accept(100, ProgressCallback.Stage.FINISHED);
+                progressCallback.accept(bytesTotal, bytesTotal, ProgressCallback.Stage.FINISHED);
                 return DownloadResult.success();
             } catch (IOException e) {
                 return DownloadResult.fail("unable to download " + source.toString(), e);
