@@ -4,9 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.7",
   "mixins": [
-    "MixinClientMain"
-  ],
-  "client": [
-
+    "MixinClientMain",
+    "MixinServerMain"
   ]
 }
