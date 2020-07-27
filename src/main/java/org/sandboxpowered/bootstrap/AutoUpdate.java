@@ -38,8 +38,8 @@ public class AutoUpdate {
         System.setProperty("java.awt.headless", "false");
         frame = new JFrame();
         BufferedImage image;
-        try (InputStream inputStream = AutoUpdate.class.getResourceAsStream("/banner.png")) {
-            image = ImageIO.read(inputStream);
+        try {
+            image = ImageIO.read(AutoUpdate.class.getResource("/banner.png"));
         } catch (IOException e) {
             throw new RuntimeException("unable to read input stream", e);
         }
