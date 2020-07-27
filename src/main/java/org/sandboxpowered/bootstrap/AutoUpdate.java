@@ -201,9 +201,7 @@ public class AutoUpdate {
 
                     //Download data to temp file
                     Path temp = home.resolve("sandbox-" + v + ".jar");
-                    if (Files.exists(temp)) {
-                        progressSetter.accept(100);
-                    } else {
+                    if (!Files.exists(temp)) {
                         Files.createFile(temp);
                         showProgress.accept(true);
                         BufferedInputStream input = new BufferedInputStream(httpConnection.getInputStream());
@@ -221,19 +219,20 @@ public class AutoUpdate {
                         //Close connections
                         input.close();
                         output.close();
+                        infoLogger.accept(String.format("Downloaded Sandbox v%s", v));
                         showProgress.accept(false);
                     }
                     if (jarExists) Files.delete(sandboxJar);
                     Files.copy(temp, sandboxJar);
                     Files.write(sandboxVersion, v.getBytes(StandardCharsets.UTF_8));
-                    infoLogger.accept(String.format("Downloaded Sandbox v%s", v));
+                    infoLogger.accept("Copied Sandbox Jar and set version string");
                     return Result.UPDATED_TO_LATEST;
                 } catch (IOException ex) {
                     errorLogger.accept("Unable to download updates", ex);
                     return Result.UNABLE_TO_DOWNLOAD;
                 }
             } else {
-                infoLogger.accept("Running latest " + v);
+                infoLogger.accept("Running latest Sandbox(v " + v + ")");
                 return Result.ON_LATEST;
             }
         } catch (IOException | SAXException | ParserConfigurationException e) {
