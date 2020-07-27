@@ -15,7 +15,7 @@
   "icon": "assets/sandbox/icon.png",
   "environment": "*",
   "mixins": [
-    "bootstrap.mixins.json"
+    "sbx_bootstrap.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.9"
