@@ -69,14 +69,7 @@ public class AutoUpdate {
         frame.setUndecorated(true);
         textLabel.setVisible(false);
         frame.setVisible(true);
-        CompletableFuture<AutoUpdate.Result> future = AutoUpdate.check();
-
-        while (!future.isDone()) {
-            //Do something in the future maybe?
-        }
-
-
-        AutoUpdate.Result result = future.join();
+        AutoUpdate.Result result = check().join();
         if (result == AutoUpdate.Result.UPDATED_TO_LATEST) {
             label.setVisible(false);
             textLabel.setVisible(true);
