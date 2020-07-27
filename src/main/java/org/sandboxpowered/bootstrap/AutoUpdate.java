@@ -72,16 +72,16 @@ public class AutoUpdate {
         };
         Icon imgIcon = new ImageIcon(AutoUpdate.class.getResource("/loading.gif"));
         JLabel label = new JLabel(imgIcon);
-        JProgressBar progressBar = new JProgressBar();
+        JProgressBar progressBar = new JProgressBar(0, 4194304);
         progressBar.setPreferredSize(new Dimension(image.getWidth() - 300, 50));
         progressBar.setUI(new DownloadProgressUI());
         progressBar.setStringPainted(true);
         progressBar.setString("0%");
         progressBar.setForeground(Color.RED);
-        JLabel textLabel = new JLabel("", JLabel.CENTER);
-        textLabel.setForeground(Color.WHITE);
+        //JLabel textLabel = new JLabel("", JLabel.CENTER);
+        //textLabel.setForeground(Color.WHITE);
         label.setBounds(image.getWidth() / 2 - 50, image.getHeight() - 150, 100, 100);
-        textLabel.setBounds(0, image.getHeight() - 150, image.getWidth(), 100);
+        //textLabel.setBounds(0, image.getHeight() - 150, image.getWidth(), 100);
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints cons = new GridBagConstraints();
@@ -95,7 +95,7 @@ public class AutoUpdate {
         progressBar.setVisible(false);
         panel.add(progressBar);
         frame.add(label);
-        frame.add(textLabel);
+        //frame.add(textLabel);
         frame.add(panel);
 
         if (frame.isAlwaysOnTopSupported())
@@ -104,7 +104,7 @@ public class AutoUpdate {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
         frame.setUndecorated(true);
-        textLabel.setVisible(false);
+        //textLabel.setVisible(false);
         frame.setVisible(true);
 
         //FIXME there should be a better way to do these
@@ -130,12 +130,12 @@ public class AutoUpdate {
                     progressBar.setString("0%");
                     break;
                 case DOWNLOADING:
-                    int percentage = (int) (bytesDownloaded / (double) bytesTotal * 100.0);
-                    progressBar.setValue(percentage);
-                    progressBar.setString(percentage + "%");
+                    //Using a high number for more precision
+                    progressBar.setValue((int) (bytesDownloaded / (double) bytesTotal * 4194304.0));
+                    progressBar.setString((int) (bytesDownloaded / (double) bytesTotal * 100.0) + "%");
                     break;
                 case COPYING:
-                    progressBar.setValue(100);
+                    progressBar.setValue(4194304);
                     progressBar.setString("100% - cleaning up");
                     break;
                 case FINISHED:
