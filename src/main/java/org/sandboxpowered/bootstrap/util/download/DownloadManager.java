@@ -39,26 +39,27 @@ public class DownloadManager {
 
                 //Open connection and get download size
                 URLConnection httpConnection = source.openConnection();
-                long completeFileSize = httpConnection.getContentLength();
-                progressCallback.accept(0L, completeFileSize, ProgressCallback.Stage.PREPARING);
+                long bytesTotal = httpConnection.getContentLength();
+                progressCallback.accept(0, ProgressCallback.Stage.PREPARING);
                 try (BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream()); BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(temp))) {
                     byte[] data = new byte[1024];
-                    long downloadedFileSize = 0;
+                    long bytesDownloaded = 0;
 
-                    int x;
-                    while ((x = inputStream.read(data, 0, 1024)) >= 0) {
+                    //TODO maybe change buffer size to make progress bar smoother? or make it configurable?
+                    int i;
+                    while ((i = inputStream.read(data, 0, 1024)) >= 0) {
                         //Add data and update progress bar
-                        downloadedFileSize += x;
-                        progressCallback.accept(downloadedFileSize, completeFileSize, ProgressCallback.Stage.DOWNLOADING);
-                        outputStream.write(data, 0, x);
+                        bytesDownloaded += i;
+                        progressCallback.accept((int) (bytesDownloaded / (double) bytesTotal * 100.0), ProgressCallback.Stage.DOWNLOADING);
+                        outputStream.write(data, 0, i);
                     }
-                    progressCallback.accept(completeFileSize, completeFileSize, ProgressCallback.Stage.COPYING);
+                    progressCallback.accept(100, ProgressCallback.Stage.COPYING);
                 }
                 Files.createDirectories(target.getParent());
                 try (InputStream inputStream = Files.newInputStream(temp, StandardOpenOption.DELETE_ON_CLOSE)) {
                     Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
                 }
-                progressCallback.accept(completeFileSize, completeFileSize, ProgressCallback.Stage.FINISHED);
+                progressCallback.accept(100, ProgressCallback.Stage.FINISHED);
                 return DownloadResult.success();
             } catch (IOException e) {
                 return DownloadResult.fail("unable to download " + source.toString(), e);

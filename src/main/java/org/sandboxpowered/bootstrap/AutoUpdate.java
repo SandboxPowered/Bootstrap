@@ -15,14 +15,13 @@ import java.io.IOException;
 public class AutoUpdate {
 
     public static void updateServer() {
-        ProgressCallback progressCallback = (bytesDownloaded, bytesTotal, stage) -> {
+        ProgressCallback progressCallback = (percentage, stage) -> {
             switch (stage) {
                 case PREPARING:
                     System.out.print("[          ] 0%");
                     break;
                 case DOWNLOADING:
-                    if (bytesTotal > 0L) {
-                        int percentage = (int) (bytesDownloaded / (double) bytesTotal) * 100;
+                    if (percentage > 0) {
                         String progress = Strings.repeat("=", percentage / 10);
                         String left = Strings.repeat(" ", 10 - progress.length());
                         System.out.print("\r[" + progress + left + "] " + percentage + "%");
@@ -122,7 +121,7 @@ public class AutoUpdate {
         //    textLabel.setVisible(true);
         //};
 
-        ProgressCallback updateProgress = (bytesDownloaded, bytesTotal, stage) -> SwingUtilities.invokeLater(() -> {
+        ProgressCallback updateProgress = (percentage, stage) -> SwingUtilities.invokeLater(() -> {
             switch (stage) {
                 case PREPARING:
                     progressBar.setVisible(true);
@@ -130,7 +129,6 @@ public class AutoUpdate {
                     progressBar.setString("0%");
                     break;
                 case DOWNLOADING:
-                    int percentage = (int) (bytesDownloaded / (double) bytesTotal) * 100;
                     progressBar.setValue(percentage);
                     progressBar.setString(percentage + "%");
                     break;
@@ -145,7 +143,7 @@ public class AutoUpdate {
         });
 
         if (SandboxUpdateChecker.check(updateProgress) == Result.UPDATED_TO_LATEST) {
-            textLabel.setText("A new update has been installed. Please restart your client to apply changes");
+            //textLabel.setText("A new update has been installed. Please restart your client to apply changes");
             JOptionPane.showMessageDialog(frame, "A new update has been installed. Please restart your client to apply changes");
             closeCallback.run();
             System.exit(5480);
@@ -165,14 +163,11 @@ public class AutoUpdate {
 
     private static class DownloadProgressUI extends BasicProgressBarUI {
         @Override
-        protected void paintIndeterminate(Graphics g, JComponent c) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+        protected void paintIndeterminate(Graphics graphics, JComponent component) {
             Rectangle r = getBox(new Rectangle());
-            g.setColor(progressBar.getForeground());
-            g.fillOval(r.x, r.y, r.width, r.height);
+            ((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setColor(progressBar.getForeground());
+            graphics.fillOval(r.x, r.y, r.width, r.height);
         }
     }
 }

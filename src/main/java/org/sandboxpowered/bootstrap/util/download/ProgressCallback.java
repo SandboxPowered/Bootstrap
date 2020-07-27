@@ -2,11 +2,10 @@ package org.sandboxpowered.bootstrap.util.download;
 
 public interface ProgressCallback {
     /**
-     * @param bytesDownloaded the amount of bytes that have been downloaded already
-     * @param bytesTotal the total amout of bytes to download
+     * @param percentage the percentage of the file downloaded
      * @param stage the stage of download
      */
-    void accept(long bytesDownloaded, long bytesTotal, Stage stage);
+    void accept(int percentage, Stage stage);
 
     enum Stage {
         PREPARING,

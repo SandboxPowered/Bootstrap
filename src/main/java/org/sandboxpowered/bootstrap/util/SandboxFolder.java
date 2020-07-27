@@ -11,23 +11,24 @@ import java.util.stream.Stream;
 
 public class SandboxFolder {
 
+    private static final Path ROOT;
     private static final Path DOWNLOAD_DIRECTORY;
     private static final Path SANDBOX_JAR_DIRECTORY;
     private static final Path ADDONS_DIRECTORY;
-    private static final Path ROOT;
 
     static {
         String homeStr = System.getProperty("user.home", ".");
         Path userHome;
-        if (SystemUtils.IS_OS_WINDOWS && System.getenv("APPDATA") != null) {
-            userHome = Paths.get(System.getenv("APPDATA"));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            String appData = System.getenv("APPDATA");
+            //Use home directory for windows instead of crashing if appdata doesn't exist
+            userHome = appData == null ? Paths.get(homeStr) : Paths.get(appData);
         } else if (SystemUtils.IS_OS_MAC) {
             userHome = Paths.get(homeStr, "Library", "Application Support");
-        } else if (SystemUtils.IS_OS_LINUX) {
-            userHome = Paths.get(homeStr);
         } else {
-            throw new IllegalArgumentException("Unsupported OS");
+            userHome = Paths.get(homeStr);
         }
+
         ROOT = userHome.resolve(".sandbox");
         DOWNLOAD_DIRECTORY = ROOT.resolve("downloads");
         SANDBOX_JAR_DIRECTORY = ROOT.resolve("versions");
@@ -66,5 +67,4 @@ public class SandboxFolder {
     public static Path getSandboxJar(Edition edition, String version) {
         return FileUtils.mkdirParent(SANDBOX_JAR_DIRECTORY.resolve(String.format("sandbox-%s-%s.jar", edition.getPrefix(), version)));
     }
-
 }
