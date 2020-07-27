@@ -3,6 +3,7 @@ package org.sandboxpowered.bootstrap;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -34,8 +35,7 @@ public class AutoUpdate {
     static JFrame frame;
 
     public static void doStuff() {
-        String headless = System.getProperty("java.awt.headless");
-        System.setProperty("java.awt.headless", "false");
+        @Nullable String headless = System.setProperty("java.awt.headless", "false");
         frame = new JFrame();
         BufferedImage image;
         try {
@@ -89,7 +89,9 @@ public class AutoUpdate {
         }
         frame.setVisible(false);
         frame.dispose();
-        System.setProperty("java.awt.headless", headless);
+        if (headless != null) {
+            System.setProperty("java.awt.headless", headless);
+        }
     }
 
     public static CompletableFuture<Result> check() {
