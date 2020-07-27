@@ -2,8 +2,8 @@ package org.sandboxpowered.bootstrap;
 
 import com.google.common.base.Strings;
 import org.jetbrains.annotations.Nullable;
-import org.sandboxpowered.bootstrap.util.download.ProgressCallback;
 import org.sandboxpowered.bootstrap.util.SandboxUpdateChecker;
+import org.sandboxpowered.bootstrap.util.download.ProgressCallback;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,7 +11,6 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class AutoUpdate {
 
@@ -44,9 +43,18 @@ public class AutoUpdate {
         }
     }
 
+    static Runnable closeCallback = () -> {};
+
     public static void updateClient() {
         @Nullable String headless = System.setProperty("java.awt.headless", "false");
         JFrame frame = new JFrame();
+        closeCallback = () -> {
+            frame.setVisible(false);
+            frame.dispose();
+            if (headless != null) {
+                System.setProperty("java.awt.headless", headless);
+            }
+        };
         BufferedImage image;
         try {
             image = ImageIO.read(AutoUpdate.class.getResource("/banner.png"));
@@ -138,18 +146,14 @@ public class AutoUpdate {
 
         if (SandboxUpdateChecker.check(updateProgress) == Result.UPDATED_TO_LATEST) {
             textLabel.setText("A new update has been installed. Please restart your client to apply changes");
-            try {
-                Thread.sleep(TimeUnit.SECONDS.toMillis(3));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            JOptionPane.showMessageDialog(frame, "A new update has been installed. Please restart your client to apply changes");
+            closeCallback.run();
             System.exit(5480);
         }
-        frame.setVisible(false);
-        frame.dispose();
-        if (headless != null) {
-            System.setProperty("java.awt.headless", headless);
-        }
+    }
+
+    public static void closeClientWindow() {
+        closeCallback.run();
     }
 
     public enum Result {

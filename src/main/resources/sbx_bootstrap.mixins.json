@@ -2,9 +2,14 @@
   "required": true,
   "package": "org.sandboxpowered.bootstrap.mixin",
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7",
+  "minVersion": "0.8",
   "mixins": [
+  ],
+  "client": [
     "MixinClientMain",
+    "WindowProviderMixin"
+  ],
+  "server": [
     "MixinServerMain"
   ]
 }
