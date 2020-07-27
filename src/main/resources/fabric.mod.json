@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "sandbox-bootstrap",
+  "id": "sandbox_bootstrap",
   "version": "${version}",
   "name": "Sandbox Bootstrap",
   "description": "Sandbox auto updater",
