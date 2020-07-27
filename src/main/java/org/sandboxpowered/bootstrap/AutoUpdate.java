@@ -121,18 +121,18 @@ public class AutoUpdate {
 
                 if (v != null && (!v.equals(version) || !Files.exists(sandboxJar))) {
                     String url = String.format("%s%s/sandbox-fabric-%s.jar", DOWNLOAD_URL, v, v);
-                    LOG.info("Downloading Sandbox v'{}'.", v);
+                    LOG.info("Downloading Sandbox v{}.", v);
                     try (InputStream inputStream = new URL(url).openStream()) {
                         Files.copy(inputStream, sandboxJar, StandardCopyOption.REPLACE_EXISTING);
                         Files.write(sandboxVersion, v.getBytes(StandardCharsets.UTF_8));
-                        LOG.info("Downloaded Sandbox v'{}' please restart your client to apply changes.", v);
+                        LOG.info("Downloaded Sandbox v{} please restart your client to apply changes.", v);
                         future.complete(Result.UPDATED_TO_LATEST);
                     } catch (IOException ex) {
                         LOG.error("Unable to download updates", ex);
                         future.complete(Result.UNABLE_TO_DOWNLOAD);
                     }
                 } else {
-                    LOG.info("Running latest '{}'", v);
+                    LOG.info("Running latest Sandbox (v{})", v);
                     future.complete(Result.ON_LATEST);
                 }
             } catch (IOException | SAXException | ParserConfigurationException e) {
