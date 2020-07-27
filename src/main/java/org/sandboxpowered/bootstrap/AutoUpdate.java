@@ -204,21 +204,17 @@ public class AutoUpdate {
                     if (!Files.exists(temp)) {
                         Files.createFile(temp);
                         showProgress.accept(true);
-                        BufferedInputStream input = new BufferedInputStream(httpConnection.getInputStream());
-                        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(temp.toFile()), 1024);
-                        byte[] data = new byte[1024];
-                        long downloadedFileSize = 0;
-                        int x;
-                        while ((x = input.read(data, 0, 1024)) >= 0) {
-                            //Add data and update progress bar
-                            downloadedFileSize += x;
-                            progressSetter.accept((int) (downloadedFileSize / (double) completeFileSize * 100.0));
-                            output.write(data, 0, x);
+                        try (BufferedInputStream input = new BufferedInputStream(httpConnection.getInputStream()); BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(temp.toFile()), 1024)) {
+                            byte[] data = new byte[1024];
+                            long downloadedFileSize = 0;
+                            int x;
+                            while ((x = input.read(data, 0, 1024)) >= 0) {
+                                //Add data and update progress bar
+                                downloadedFileSize += x;
+                                progressSetter.accept((int) (downloadedFileSize / (double) completeFileSize * 100.0));
+                                output.write(data, 0, x);
+                            }
                         }
-
-                        //Close connections
-                        input.close();
-                        output.close();
                         infoLogger.accept("Downloaded Sandbox v" + v);
                         showProgress.accept(false);
                     }
@@ -242,9 +238,11 @@ public class AutoUpdate {
     }
 
     public static String readStringFromURL(String requestURL) throws IOException {
-        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+        try (InputStream stream = new URL(requestURL).openStream()) {
+            try (Scanner scanner = new Scanner(stream, StandardCharsets.UTF_8.toString())) {
+                scanner.useDelimiter("\\A");
+                return scanner.hasNext() ? scanner.next() : "";
+            }
         }
     }
 
