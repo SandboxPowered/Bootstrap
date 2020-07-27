@@ -219,7 +219,7 @@ public class AutoUpdate {
                         //Close connections
                         input.close();
                         output.close();
-                        infoLogger.accept(String.format("Downloaded Sandbox v%s", v));
+                        infoLogger.accept("Downloaded Sandbox v" + v);
                         showProgress.accept(false);
                     }
                     if (jarExists) Files.delete(sandboxJar);
@@ -232,7 +232,7 @@ public class AutoUpdate {
                     return Result.UNABLE_TO_DOWNLOAD;
                 }
             } else {
-                infoLogger.accept("Running latest Sandbox(v " + v + ")");
+                infoLogger.accept("Running latest Sandbox(v" + v + ")");
                 return Result.ON_LATEST;
             }
         } catch (IOException | SAXException | ParserConfigurationException e) {
