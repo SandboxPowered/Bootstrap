@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = Main.class, priority = 1)
 public class MixinClientMain {
     @Inject(method = "main", at = @At("HEAD"))
-    private static void main(String[] args, CallbackInfo info) throws Exception {
+    private static void main(String[] args, CallbackInfo info) {
         AutoUpdate.doStuff();
     }
 }

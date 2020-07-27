@@ -1,6 +1,6 @@
 package org.sandboxpowered.bootstrap;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -16,10 +16,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -27,17 +28,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class AutoUpdate {
-    private static final Logger LOG = LogManager.getLogger("Sandbox|Bootstrap");
     public static final String UPDATE_CHECK_URL = "https://dl.bintray.com/sandboxpowered/Loader/org/sandboxpowered/sandbox-fabric/maven-metadata.xml";
     public static final String DOWNLOAD_URL = "https://dl.bintray.com/sandboxpowered/Loader/org/sandboxpowered/sandbox-fabric/";
-
+    private static final Logger LOG = LogManager.getLogger("Sandbox|Bootstrap");
     static JFrame frame;
 
-    public static void doStuff() throws Exception {
+    public static void doStuff() {
         String headless = System.getProperty("java.awt.headless");
         System.setProperty("java.awt.headless", "false");
         frame = new JFrame();
-        BufferedImage image = ImageIO.read(AutoUpdate.class.getResourceAsStream("/banner.png"));
+        BufferedImage image;
+        try (InputStream inputStream = AutoUpdate.class.getResourceAsStream("/banner.png")) {
+            image = ImageIO.read(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("unable to read input stream", e);
+        }
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -49,8 +54,8 @@ public class AutoUpdate {
         JLabel label = new JLabel(imgIcon);
         JLabel textLabel = new JLabel("A new update has been installed. Please restart your client", JLabel.CENTER);
         textLabel.setForeground(Color.white);
-        label.setBounds(image.getWidth()/2-50, image.getHeight()-150, 100, 100);
-        textLabel.setBounds(0, image.getHeight()-150, image.getWidth(), 100);
+        label.setBounds(image.getWidth() / 2 - 50, image.getHeight() - 150, 100, 100);
+        textLabel.setBounds(0, image.getHeight() - 150, image.getWidth(), 100);
         panel.setSize(image.getWidth(), image.getHeight());
         panel.setOpaque(false);
         frame.add(label);
@@ -70,11 +75,16 @@ public class AutoUpdate {
             //Do something in the future maybe?
         }
 
-        AutoUpdate.Result result = future.get();
+
+        AutoUpdate.Result result = future.join();
         if (result == AutoUpdate.Result.UPDATED_TO_LATEST) {
             label.setVisible(false);
             textLabel.setVisible(true);
-            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+            try {
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.exit(5480);
         }
         frame.setVisible(false);
@@ -82,31 +92,20 @@ public class AutoUpdate {
         System.setProperty("java.awt.headless", headless);
     }
 
-    public enum Result {
-        ON_LATEST,
-        UPDATED_TO_LATEST,
-        UNABLE_TO_DOWNLOAD,
-        UNABLE_TO_CHECK
-    }
-
-    public static String readStringFromURL(String requestURL) throws IOException {
-        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
-        }
-    }
-
-    public static CompletableFuture<Result> check() throws IOException {
+    public static CompletableFuture<Result> check() {
         LOG.info("Checking for updates");
-        File currentFile = new File(".");
-        File modsFolder = new File(currentFile, "mods");
-        File sandboxVersion = new File(modsFolder, "sandbox.version");
-        File sandboxJar = new File(modsFolder, "sandbox.jar");
+        Path modsFolder = Paths.get("mods");
+        Path sandboxVersion = modsFolder.resolve("sandbox.version");
+        Path sandboxJar = modsFolder.resolve("sandbox.jar");
 
         String currentVersion = null;
 
-        if (sandboxVersion.exists()) {
-            currentVersion = FileUtils.readFileToString(sandboxVersion, StandardCharsets.UTF_8);
+        if (Files.exists(sandboxVersion)) {
+            try (InputStream stream = Files.newInputStream(sandboxVersion, StandardOpenOption.READ)) {
+                currentVersion = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new RuntimeException("unable to read existing Sandbox version", e);
+            }
         }
 
         CompletableFuture<Result> future = new CompletableFuture<>();
@@ -125,15 +124,12 @@ public class AutoUpdate {
 
                 String v = e.item(0).getNodeValue();
 
-                if (v == null || !v.equals(version) || !sandboxJar.exists()) {
+                if (v != null && (!v.equals(version) || !Files.exists(sandboxJar))) {
                     String url = String.format("%s%s/sandbox-fabric-%s.jar", DOWNLOAD_URL, v, v);
-                    if (sandboxJar.exists())
-                        sandboxJar.delete();
-
-                    try {
-                        LOG.info("Downloading Sandbox v'{}'.", v);
-                        FileUtils.copyURLToFile(new URL(url), sandboxJar);
-                        FileUtils.writeStringToFile(sandboxVersion, v, StandardCharsets.UTF_8);
+                    LOG.info("Downloading Sandbox v'{}'.", v);
+                    try (InputStream inputStream = new URL(url).openStream()) {
+                        Files.copy(inputStream, sandboxJar, StandardCopyOption.REPLACE_EXISTING);
+                        Files.write(sandboxVersion, v.getBytes(StandardCharsets.UTF_8));
                         LOG.info("Downloaded Sandbox v'{}' please restart your client to apply changes.", v);
                         future.complete(Result.UPDATED_TO_LATEST);
                     } catch (IOException ex) {
@@ -150,5 +146,19 @@ public class AutoUpdate {
             }
         });
         return future;
+    }
+
+    public static String readStringFromURL(String requestURL) throws IOException {
+        try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        }
+    }
+
+    public enum Result {
+        ON_LATEST,
+        UPDATED_TO_LATEST,
+        UNABLE_TO_DOWNLOAD,
+        UNABLE_TO_CHECK
     }
 }
