@@ -13,6 +13,10 @@
   },
   "license": "LGPLv3",
   "icon": "assets/sandbox/icon.png",
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:parent": "sandbox"
+  },
   "environment": "*",
   "mixins": [
     "sbx_bootstrap.mixins.json"
