@@ -61,11 +61,10 @@ public class AutoUpdate {
     public static void updateClient() {
         @Nullable String headless = System.setProperty("java.awt.headless", "false");
         JFrame frame = new JFrame();
-        //TODO add icon.png
-        //frame.setIconImage(ImageIO.read(AutoUpdate.class.getResourceAsStream("/icon.png")));
         BufferedImage image;
         try {
             image = ImageIO.read(AutoUpdate.class.getResource("/banner.png"));
+            frame.setIconImage(ImageIO.read(AutoUpdate.class.getResourceAsStream("/icon.png")));
         } catch (IOException e) {
             throw new RuntimeException("unable to read input stream", e);
         }
@@ -105,7 +104,8 @@ public class AutoUpdate {
         frame.add(textLabel);
         frame.add(panel);
 
-        //frame.setAlwaysOnTop(true);
+        if(frame.isAlwaysOnTopSupported())
+            frame.setAlwaysOnTop(true);
         frame.setSize(image.getWidth(), image.getHeight());
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
@@ -153,11 +153,11 @@ public class AutoUpdate {
         infoLogger.accept("Checking for updates");
         Path home;
         if (SystemUtils.IS_OS_WINDOWS) {
-            home = Paths.get(System.getenv("APPDATA"), ".sandbox");
+            home = Paths.get(System.getenv("APPDATA"), ".sandbox/cache");
         } else if (SystemUtils.IS_OS_MAC) {
-            home = Paths.get(System.getProperty("user.home"), "Local Settings\\ApplicationData\\.sandbox");
+            home = Paths.get(System.getProperty("user.home"), "Local Settings/ApplicationData/.sandbox/cache");
         } else if (SystemUtils.IS_OS_LINUX) {
-            home = Paths.get(System.getProperty("user.home"), ".sandbox");
+            home = Paths.get(System.getProperty("user.home"), ".sandbox/cache");
         } else {
             throw new IllegalArgumentException("Unsupported OS");
         }
