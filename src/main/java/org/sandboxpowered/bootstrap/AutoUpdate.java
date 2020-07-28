@@ -140,7 +140,6 @@ public class AutoUpdate {
                     break;
                 case FINISHED:
                     progressBar.setString("100% - done!");
-                    progressBar.setVisible(false);
             }
         });
 
