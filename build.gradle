@@ -1,3 +1,6 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
 plugins {
     id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'java'
@@ -44,6 +47,16 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
+    }
+
+    doLast {
+        sourceSets.main.output.asFileTree.each {
+            if(it.name == "fabric.mod.json") {
+                def json = new JsonSlurper().parse(it, "UTF-8")
+                json.depends.minecraft = ">=${project.minecraft_version}"
+                it.setText(JsonOutput.prettyPrint(JsonOutput.toJson(json)), "UTF-8")
+            }
+        }
     }
 }
 
