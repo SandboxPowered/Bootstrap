@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,7 +75,7 @@ public class SandboxUpdateChecker {
                         return AutoUpdate.Result.UNABLE_TO_DOWNLOAD;
                     }
                 }
-                Files.copy(cachedJar, sandboxJar);
+                Files.copy(cachedJar, sandboxJar, StandardCopyOption.REPLACE_EXISTING);
                 Files.write(sandboxVersion, v.getBytes(StandardCharsets.UTF_8));
                 SandboxBootstrap.LOG.info("Downloaded Sandbox v" + v);
                 return AutoUpdate.Result.UPDATED_TO_LATEST;
