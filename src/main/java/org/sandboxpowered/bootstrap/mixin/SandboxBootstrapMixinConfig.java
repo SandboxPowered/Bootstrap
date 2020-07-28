@@ -1,6 +1,5 @@
 package org.sandboxpowered.bootstrap.mixin;
 
-import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -13,14 +12,7 @@ import java.util.Set;
 public class SandboxBootstrapMixinConfig implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
-        switch (FabricLoader.getInstance().getEnvironmentType()) {
-            case CLIENT:
-                AutoUpdate.updateClient();
-                break;
-            case SERVER:
-                AutoUpdate.updateServer();
-                break;
-        }
+        AutoUpdate.onLaunch();
     }
 
     @Override

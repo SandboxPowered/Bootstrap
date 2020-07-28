@@ -1,6 +1,12 @@
 package org.sandboxpowered.bootstrap;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
 import org.jetbrains.annotations.Nullable;
 import org.sandboxpowered.bootstrap.util.SandboxUpdateChecker;
 import org.sandboxpowered.bootstrap.util.download.ProgressCallback;
@@ -11,10 +17,13 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 
 public class AutoUpdate {
 
-    public static void updateServer() {
+    private static void updateServer() {
         ProgressCallback progressCallback = (bytesDownloaded, bytesTotal, stage) -> {
             switch (stage) {
                 case PREPARING:
@@ -45,7 +54,7 @@ public class AutoUpdate {
 
     static Runnable closeCallback = () -> {};
 
-    public static void updateClient() {
+    private static void updateClient() {
         @Nullable String headless = System.setProperty("java.awt.headless", "false");
         JFrame frame = new JFrame();
         closeCallback = () -> {
@@ -151,6 +160,34 @@ public class AutoUpdate {
 
     public static void closeClientWindow() {
         closeCallback.run();
+    }
+
+    public static void onLaunch() {
+        try (Reader reader = new InputStreamReader(new URL(SandboxBootstrap.MINECRAFT_VERSION_MANIFEST).openStream())) {
+            JsonObject json = new Gson().fromJson(reader, JsonObject.class);
+            Version latest = Version.parse(json.getAsJsonObject("latest").get("release").getAsString());
+            Version current = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new IllegalStateException("minecraft not found")).getMetadata().getVersion();
+            if(!current.equals(latest)) {
+                SandboxBootstrap.LOG.warn("=============================================================================");
+                SandboxBootstrap.LOG.warn("outdated Minecraft Version detected! (you are on {}, latest is {})", current::getFriendlyString, latest::getFriendlyString);
+                SandboxBootstrap.LOG.warn("This is not supported. Sandbox Bootstrap will shot down.");
+                SandboxBootstrap.LOG.warn("=============================================================================");
+                return;
+            }
+        } catch (JsonParseException | IOException | VersionParsingException e) {
+            SandboxBootstrap.LOG.error("Unable to check for Sandbox updates", e);
+            return;
+        }
+
+        //all checks passed, continue loading
+        switch (FabricLoader.getInstance().getEnvironmentType()) {
+            case CLIENT:
+                updateClient();
+                break;
+            case SERVER:
+                updateServer();
+                break;
+        }
     }
 
     public enum Result {

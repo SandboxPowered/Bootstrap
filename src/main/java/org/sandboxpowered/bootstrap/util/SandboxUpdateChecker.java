@@ -44,7 +44,7 @@ public class SandboxUpdateChecker {
 
         Document doc;
         try {
-            String s = DownloadManager.readStringFromURL(SandboxBootstrap.UPDATE_CHECK_URL);
+            String s = DownloadManager.readStringFromURL(SandboxBootstrap.SANDBOX_FABRIC_VERSION_MANIFEST);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
@@ -57,7 +57,7 @@ public class SandboxUpdateChecker {
         String v = nodes.item(0).getNodeValue();
 
         if (v != null && (!v.equals(currentVersion) || !Files.exists(sandboxJar))) {
-            String url = String.format("%s/%s/sandbox-%s-%s.jar", SandboxBootstrap.DOWNLOAD_URL, v, Edition.FABRIC.getPrefix(), v);
+            String url = String.format("%s/%s/sandbox-%s-%s.jar", SandboxBootstrap.SANDBOX_FABRIC_DOWNLOAD_URL, v, Edition.FABRIC.getPrefix(), v);
             SandboxBootstrap.LOG.info("Downloading Sandbox v" + v + "...");
             Path cachedJar = SandboxFolder.getSandboxJar(Edition.FABRIC, v);
             try { //TODO move to proper download manager impl
