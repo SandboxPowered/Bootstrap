@@ -57,8 +57,8 @@ public class AutoUpdate {
         };
         BufferedImage image;
         try {
-            image = ImageIO.read(AutoUpdate.class.getResource("/banner.png"));
-            frame.setIconImage(ImageIO.read(AutoUpdate.class.getResource("/icon.png")));
+            image = ImageIO.read(AutoUpdate.class.getResource("/sboxbootstrap/banner.png"));
+            frame.setIconImage(ImageIO.read(AutoUpdate.class.getResource("/sboxbootstrap/icon.png")));
         } catch (IOException e) {
             throw new RuntimeException("unable to read input stream", e);
         }
@@ -70,7 +70,7 @@ public class AutoUpdate {
                 graphics.drawImage(image, 0, 0, this);
             }
         };
-        Icon imgIcon = new ImageIcon(AutoUpdate.class.getResource("/loading.gif"));
+        Icon imgIcon = new ImageIcon(AutoUpdate.class.getResource("/sboxbootstrap/loading.gif"));
         JLabel label = new JLabel(imgIcon);
         JProgressBar progressBar = new JProgressBar(0, 4194304);
         progressBar.setPreferredSize(new Dimension(image.getWidth() - 300, 50));
