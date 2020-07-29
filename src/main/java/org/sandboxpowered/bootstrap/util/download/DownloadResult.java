@@ -49,5 +49,22 @@ public class DownloadResult {
         SUCCESS,
         FAIL,
         ABORTED;
+
+        /**
+         * @see DownloadResult#init()
+         */
+        private static void init() {
+            //NO-OP
+        }
+    }
+
+    /**
+     * used to load class early so that mixin doesn't stall when loading it from another thread
+     * FIXME this looks like a mixin bug
+     *
+     * DO NOT REMOVE OR THINGS WILL BREAK!
+     */
+    public static void init() {
+        Type.init();
     }
 }

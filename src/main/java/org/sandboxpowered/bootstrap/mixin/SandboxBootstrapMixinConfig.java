@@ -5,14 +5,18 @@ import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class SandboxBootstrapMixinConfig implements IMixinConfigPlugin {
+
+    public SandboxBootstrapMixinConfig() {
+        AutoUpdate.onLaunch();
+    }
+
     @Override
     public void onLoad(String mixinPackage) {
-        AutoUpdate.onLaunch();
+
     }
 
     @Override
@@ -32,7 +36,7 @@ public class SandboxBootstrapMixinConfig implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        return Collections.emptyList();
+        return null;
     }
 
     @Override

@@ -41,6 +41,8 @@ public class DownloadManager {
     }
 
     public static CompletableFuture<DownloadResult> download(URL source, Path target, String tempFileName, ProgressCallback progressCallback) {
+        DownloadResult.init();
+
         return CompletableFuture.supplyAsync(() -> {
             if (Files.isDirectory(target)) {
                 return DownloadResult.of("Expected file but target was a directory!", null, DownloadResult.Type.ABORTED);
