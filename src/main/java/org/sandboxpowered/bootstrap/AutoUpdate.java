@@ -56,6 +56,11 @@ public class AutoUpdate {
 
     private static void updateClient() {
         @Nullable String headless = System.setProperty("java.awt.headless", "false");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            SandboxBootstrap.LOG.error("Unable to set Swing Look-And-Feel", e);
+        }
         JFrame frame = new JFrame();
         closeCallback = () -> {
             frame.setVisible(false);
@@ -151,8 +156,8 @@ public class AutoUpdate {
         });
 
         if (SandboxUpdateChecker.check(updateProgress) == Result.UPDATED_TO_LATEST) {
-            //textLabel.setText("A new update has been installed. Please restart your client to apply changes");
-            JOptionPane.showMessageDialog(frame, "A new update has been installed. Please restart your client to apply changes");
+            //textLabel.setText("An update has been installed. Please restart your client to apply changes");
+            JOptionPane.showMessageDialog(frame, "An update has been installed. Please restart your client to apply changes");
             closeCallback.run();
             System.exit(5480);
         }
