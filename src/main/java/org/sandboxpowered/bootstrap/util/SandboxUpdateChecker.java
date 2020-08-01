@@ -1,6 +1,10 @@
 package org.sandboxpowered.bootstrap.util;
 
+import net.fabricmc.loader.ModContainer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
+import net.fabricmc.loader.util.UrlConversionException;
+import net.fabricmc.loader.util.UrlUtil;
 import org.apache.commons.io.IOUtils;
 import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
@@ -18,11 +22,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 
 public class SandboxUpdateChecker {
@@ -72,6 +76,34 @@ public class SandboxUpdateChecker {
                         if (result.getMessage() != null) {
                             SandboxBootstrap.LOG.error(result.getMessage(), result.getError());
                         }
+                        return AutoUpdate.Result.UNABLE_TO_DOWNLOAD;
+                    }
+                }
+                if (Files.exists(sandboxJar)) {
+                    SandboxBootstrap.LOG.info("Removing existing Sandbox files...");
+                    SandboxBootstrap.LOG.debug("Attempting to close loaded file systems");
+                    Iterator<ModContainer> it = FabricLoader.getInstance().getAllMods().stream().map(ModContainer.class::cast).iterator();
+                    while (it.hasNext()) {
+                        ModContainer container = it.next();
+                        String modid = container.getMetadata().getId();
+                        if (!modid.equals(SandboxBootstrap.MODID)) {
+                            try {
+                                Path holder = UrlUtil.asPath(container.getOriginUrl()).toAbsolutePath();
+                                URI pathUri = holder.toUri();
+                                if (!Files.isDirectory(holder)) {
+                                    pathUri = new URI("jar:" + pathUri.getScheme(), pathUri.getHost(), pathUri.getPath(), pathUri.getFragment());
+                                }
+                                SandboxBootstrap.LOG.trace("Closing file system for mod {}", modid);
+                                IOUtil.close(FileSystems.getFileSystem(pathUri));
+                            } catch (UrlConversionException | IOException | URISyntaxException e) {
+                                SandboxBootstrap.LOG.error("Unable to close mod file systems", e);
+                                return AutoUpdate.Result.UNABLE_TO_DOWNLOAD;
+                            }
+                        }
+                    }
+                    SandboxBootstrap.LOG.warn("Attempting to close Knot's parent ClassLoader, this may cause issues");
+                    if(!IOUtil.tryClose(FabricLauncherBase.getLauncher().getTargetClassLoader().getParent())) {
+                        SandboxBootstrap.LOG.error("Unable to close ClassLoader: does not implement AutoCloseable!");
                         return AutoUpdate.Result.UNABLE_TO_DOWNLOAD;
                     }
                 }
