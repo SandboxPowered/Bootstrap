@@ -2,10 +2,13 @@ package org.sandboxpowered.bootstrap.util;
 
 import net.fabricmc.loader.ModContainer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.fabricmc.loader.util.UrlConversionException;
 import net.fabricmc.loader.util.UrlUtil;
-import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.Nullable;
 import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
 import org.sandboxpowered.bootstrap.util.download.DownloadManager;
@@ -21,11 +24,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,16 +40,10 @@ public class SandboxUpdateChecker {
         SandboxBootstrap.LOG.info("Checking for updates");
 
         Path modsFolder = FabricLoader.getInstance().getGameDir().toAbsolutePath().resolve("mods");
-        Path sandboxVersion = modsFolder.resolve("sandbox.version");
         Path sandboxJar = modsFolder.resolve("sandbox.jar");
-        String currentVersion = null;
-        if (Files.exists(sandboxVersion)) {
-            try (InputStream stream = Files.newInputStream(sandboxVersion, StandardOpenOption.READ)) {
-                currentVersion = IOUtils.toString(stream, StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new RuntimeException("unable to read existing Sandbox version", e);
-            }
-        }
+
+
+        Version currentVersion = FabricLoader.getInstance().getModContainer(SandboxBootstrap.SANDBOX_MODID).map(net.fabricmc.loader.api.ModContainer::getMetadata).map(ModMetadata::getVersion).orElse(null);
 
         Document doc;
         try {
@@ -58,9 +57,19 @@ public class SandboxUpdateChecker {
         }
         Element element = doc.getDocumentElement();
         NodeList nodes = element.getElementsByTagName("latest").item(0).getChildNodes();
-        String v = nodes.item(0).getNodeValue();
+        @Nullable String v = nodes.item(0).getNodeValue();
+        Version latest;
+        try {
+            if(v == null) {
+                throw new VersionParsingException("null version");
+            }
+            latest = Version.parse(v);
+        } catch (VersionParsingException e) {
+            SandboxBootstrap.LOG.error("Unable to parse latest version", e);
+            return AutoUpdate.Result.UNABLE_TO_CHECK;
+        }
 
-        if (v != null && (!v.equals(currentVersion) || !Files.exists(sandboxJar))) {
+        if (!latest.equals(currentVersion) || !Files.exists(sandboxJar)) {
             String url = String.format("%s/%s/sandbox-%s-%s.jar", SandboxBootstrap.SANDBOX_FABRIC_DOWNLOAD_URL, v, Edition.FABRIC.getPrefix(), v);
             SandboxBootstrap.LOG.info("Downloading Sandbox v" + v + "...");
             Path cachedJar = SandboxFolder.getSandboxJar(Edition.FABRIC, v);
@@ -108,7 +117,6 @@ public class SandboxUpdateChecker {
                     }
                 }
                 Files.copy(cachedJar, sandboxJar, StandardCopyOption.REPLACE_EXISTING);
-                Files.write(sandboxVersion, v.getBytes(StandardCharsets.UTF_8));
                 SandboxBootstrap.LOG.info("Downloaded Sandbox v" + v);
                 return AutoUpdate.Result.UPDATED_TO_LATEST;
             } catch (IOException e) {
