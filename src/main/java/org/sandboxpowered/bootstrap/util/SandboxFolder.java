@@ -1,6 +1,6 @@
 package org.sandboxpowered.bootstrap.util;
 
-import org.apache.commons.lang3.SystemUtils;
+import net.minecraft.util.Util;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
 
 import java.io.IOException;
@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class SandboxFolder {
-
     private static final Path ROOT;
     private static final Path DOWNLOAD_DIRECTORY;
     private static final Path SANDBOX_JAR_DIRECTORY;
@@ -19,14 +18,18 @@ public class SandboxFolder {
     static {
         String homeStr = System.getProperty("user.home", ".");
         Path userHome;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            String appData = System.getenv("APPDATA");
-            //Use home directory for windows instead of crashing if appdata doesn't exist
-            userHome = appData == null ? Paths.get(homeStr) : Paths.get(appData);
-        } else if (SystemUtils.IS_OS_MAC) {
-            userHome = Paths.get(homeStr, "Library", "Application Support");
-        } else {
-            userHome = Paths.get(homeStr);
+        switch (Util.getOperatingSystem()) {
+            case WINDOWS:
+                String appData = System.getenv("APPDATA");
+                //Use home directory for windows instead of crashing if appdata doesn't exist
+                userHome = appData == null ? Paths.get(homeStr) : Paths.get(appData);
+                break;
+            case OSX:
+                userHome = Paths.get(homeStr, "Library", "Application Support");
+                break;
+            default:
+                userHome = Paths.get(homeStr);
+                break;
         }
 
         ROOT = userHome.resolve(".sandbox");

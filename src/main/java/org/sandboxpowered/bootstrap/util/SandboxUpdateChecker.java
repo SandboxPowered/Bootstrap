@@ -95,7 +95,7 @@ public class SandboxUpdateChecker {
                     while (it.hasNext()) {
                         ModContainer container = it.next();
                         String modid = container.getMetadata().getId();
-                        if (!modid.equals(SandboxBootstrap.MODID)) {
+                        if (!modid.equals(SandboxBootstrap.MOD_ID)) {
                             try {
                                 Path holder = UrlUtil.asPath(container.getOriginUrl()).toAbsolutePath();
                                 URI pathUri = holder.toUri();
