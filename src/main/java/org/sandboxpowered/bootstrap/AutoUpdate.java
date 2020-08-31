@@ -174,8 +174,8 @@ public class AutoUpdate {
             Version current = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new IllegalStateException("minecraft not found")).getMetadata().getVersion();
             if(!current.equals(latest)) {
                 SandboxBootstrap.LOG.warn("=============================================================================");
-                SandboxBootstrap.LOG.warn("outdated Minecraft Version detected! (you are on {}, latest is {})", current::getFriendlyString, latest::getFriendlyString);
-                SandboxBootstrap.LOG.warn("This is not supported. Sandbox Bootstrap will shot down.");
+                SandboxBootstrap.LOG.warn("Outdated Minecraft Version detected! (you are on {}, latest is {})", current::getFriendlyString, latest::getFriendlyString);
+                SandboxBootstrap.LOG.warn("This is not supported. Sandbox Bootstrap will shut down.");
                 SandboxBootstrap.LOG.warn("=============================================================================");
                 return;
             }
