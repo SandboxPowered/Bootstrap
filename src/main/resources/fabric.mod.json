@@ -11,7 +11,7 @@
     "homepage": "https://sandboxpowered.org",
     "sources": "https://github.com/SandboxPowered/Bootstrap"
   },
-  "license": "LGPLv3",
+  "license": "GPL-3.0-or-later",
   "icon": "/sboxbootstrap/icon.png",
   "custom": {
     "modmenu:api": true,
