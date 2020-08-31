@@ -78,7 +78,7 @@ public class AutoUpdate {
     }
 
     public static void onLaunch() {
-        try (Reader reader = new InputStreamReader(new URL(SandboxBootstrap.MINECRAFT_VERSION_MANIFEST).openStream())) {
+        try (Reader reader = new InputStreamReader(new URL(Constants.MINECRAFT_VERSION_MANIFEST_URL).openStream())) {
             JsonObject json = new Gson().fromJson(reader, JsonObject.class);
             Version latest = Version.parse(json.getAsJsonObject("latest").get("release").getAsString());
             Version current = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new IllegalStateException("minecraft not found")).getMetadata().getVersion();

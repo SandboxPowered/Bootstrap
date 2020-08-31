@@ -10,6 +10,7 @@ import net.fabricmc.loader.util.UrlConversionException;
 import net.fabricmc.loader.util.UrlUtil;
 import org.jetbrains.annotations.Nullable;
 import org.sandboxpowered.bootstrap.AutoUpdate;
+import org.sandboxpowered.bootstrap.Constants;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
 import org.sandboxpowered.bootstrap.util.download.DownloadManager;
 import org.sandboxpowered.bootstrap.util.download.DownloadResult;
@@ -47,7 +48,7 @@ public class SandboxUpdateChecker {
 
         Document doc;
         try {
-            String s = DownloadManager.readStringFromURL(SandboxBootstrap.SANDBOX_FABRIC_VERSION_MANIFEST);
+            String s = DownloadManager.readStringFromURL(Constants.SANDBOX_FABRIC_VERSION_MANIFEST_URL);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.parse(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
@@ -70,7 +71,7 @@ public class SandboxUpdateChecker {
         }
 
         if (!latest.equals(currentVersion) || !Files.exists(sandboxJar)) {
-            String url = String.format("%s/%s/sandbox-%s-%s.jar", SandboxBootstrap.SANDBOX_FABRIC_DOWNLOAD_URL, v, Edition.FABRIC.getPrefix(), v);
+            String url = String.format("%s/%s/sandbox-%s-%s.jar", Constants.SANDBOX_FABRIC_MAVEN_URL, v, Edition.FABRIC.getPrefix(), v);
             SandboxBootstrap.LOG.info("Downloading Sandbox v" + v + "...");
             Path cachedJar = SandboxFolder.getSandboxJar(Edition.FABRIC, v);
             try { //TODO move to proper download manager impl

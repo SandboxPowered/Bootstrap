@@ -1,6 +1,8 @@
 package org.sandboxpowered.bootstrap.util;
 
+import com.google.common.base.MoreObjects;
 import net.minecraft.util.Util;
+import org.sandboxpowered.bootstrap.Constants;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
 
 import java.io.IOException;
@@ -15,24 +17,32 @@ public class SandboxFolder {
     private static final Path SANDBOX_JAR_DIRECTORY;
     private static final Path ADDONS_DIRECTORY;
 
+
     static {
-        String homeStr = System.getProperty("user.home", ".");
-        Path userHome;
-        switch (Util.getOperatingSystem()) {
-            case WINDOWS:
-                String appData = System.getenv("APPDATA");
-                //Use home directory for windows instead of crashing if appdata doesn't exist
-                userHome = appData == null ? Paths.get(homeStr) : Paths.get(appData);
-                break;
-            case OSX:
-                userHome = Paths.get(homeStr, "Library", "Application Support");
-                break;
-            default:
-                userHome = Paths.get(homeStr);
-                break;
+        //noinspection deprecation
+        if(Constants.CUSTOM_SANDBOX_FOLDER_LOCATION != null) {
+            //noinspection deprecation
+            ROOT = Paths.get(Constants.CUSTOM_SANDBOX_FOLDER_LOCATION);
+        }
+        else {
+            String homeStr = System.getProperty("user.home", ".");
+            Path userHome;
+            switch (Util.getOperatingSystem()) {
+                case WINDOWS:
+                    String appData = System.getenv("APPDATA");
+                    //Use home directory for windows instead of crashing if appdata doesn't exist
+                    userHome = Paths.get(MoreObjects.firstNonNull(appData, homeStr));
+                    break;
+                case OSX:
+                    userHome = Paths.get(homeStr, "Library", "Application Support");
+                    break;
+                default:
+                    userHome = Paths.get(homeStr);
+                    break;
+            }
+            ROOT = userHome.resolve(".sandbox");
         }
 
-        ROOT = userHome.resolve(".sandbox");
         DOWNLOAD_DIRECTORY = ROOT.resolve("downloads");
         SANDBOX_JAR_DIRECTORY = ROOT.resolve("versions");
         ADDONS_DIRECTORY = ROOT.resolve("addons");
