@@ -70,7 +70,7 @@ bintray {
         repo = 'Loader'
         name = 'bootstrap'
         userOrg = 'sandboxpowered'
-        licenses = ['LGPL-3.0']
+        licenses = ['GPL-3.0-or-later']
         vcsUrl = 'https://github.com/sandboxpowered/bootstrap.git'
         publicDownloadNumbers = true
         githubRepo = 'sandboxpowered/bootstrap'
