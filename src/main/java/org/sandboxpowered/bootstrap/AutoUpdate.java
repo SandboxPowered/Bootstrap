@@ -44,34 +44,8 @@ public class AutoUpdate {
                 break;
         }
     };
-
-    private static void updateServer() {
-        if (SandboxUpdateChecker.check(HEADLESS_PROGRESS_CALLBACK) == AutoUpdate.Result.UPDATED_TO_LATEST) {
-            SandboxBootstrap.LOG.info("A new update has been installed. Please restart your server to apply changes");
-            System.exit(5480);
-        }
-    }
-
-    static CloseCallback closeCallback = () -> {};
-
-    private static DownloadHandler createHeadlessDownloadHandler() {
-        //TODO populate stub methods
-        PreDownloadCallback pre = () -> {};
-        PostDownloadCallback post = () -> {};
-        CloseCallback close = () -> {};
-        return DelegatingDownloadHandler.of(HEADLESS_PROGRESS_CALLBACK, pre, post, close);
-    }
-
-    private static void updateClient() {
-            DownloadHandler downloadHandler = Constants.FORCE_HEADLESS ? createHeadlessDownloadHandler() : new GuiDownloadHandler();
-            closeCallback = downloadHandler;
-        Result result = SandboxUpdateChecker.check(downloadHandler);
-        if (result == Result.UPDATED_TO_LATEST) {
-            downloadHandler.onFinishedDownloading();
-            closeCallback.onClose();
-            System.exit(5480);
-        }
-    }
+    static CloseCallback closeCallback = () -> {
+    };
 
     public static void closeClientWindow() {
         closeCallback.onClose();
@@ -82,7 +56,7 @@ public class AutoUpdate {
             JsonObject json = new Gson().fromJson(reader, JsonObject.class);
             Version latest = Version.parse(json.getAsJsonObject("latest").get("release").getAsString());
             Version current = FabricLoader.getInstance().getModContainer("minecraft").orElseThrow(() -> new IllegalStateException("minecraft not found")).getMetadata().getVersion();
-            if(!current.equals(latest)) {
+            if (!current.equals(latest)) {
                 SandboxBootstrap.LOG.warn("=============================================================================");
                 SandboxBootstrap.LOG.warn("Outdated Minecraft Version detected! (you are on {}, latest is {})", current::getFriendlyString, latest::getFriendlyString);
                 SandboxBootstrap.LOG.warn("This is not supported. Sandbox Bootstrap will shut down.");
@@ -103,6 +77,36 @@ public class AutoUpdate {
                 updateServer();
                 break;
         }
+    }
+
+    private static void updateClient() {
+        DownloadHandler downloadHandler = Constants.FORCE_HEADLESS ? createHeadlessDownloadHandler() : new GuiDownloadHandler();
+        closeCallback = downloadHandler;
+        downloadHandler.onStartDownloading();
+        Result result = SandboxUpdateChecker.check(downloadHandler);
+        if (result == Result.UPDATED_TO_LATEST) {
+            downloadHandler.onFinishedDownloading();
+            closeCallback.onClose();
+            System.exit(5480);
+        }
+    }
+
+    private static void updateServer() {
+        if (SandboxUpdateChecker.check(HEADLESS_PROGRESS_CALLBACK) == AutoUpdate.Result.UPDATED_TO_LATEST) {
+            SandboxBootstrap.LOG.info("A new update has been installed. Please restart your server to apply changes");
+            System.exit(5480);
+        }
+    }
+
+    private static DownloadHandler createHeadlessDownloadHandler() {
+        //TODO populate stub methods
+        PreDownloadCallback pre = () -> {
+        };
+        PostDownloadCallback post = () -> {
+        };
+        CloseCallback close = () -> {
+        };
+        return DelegatingDownloadHandler.of(HEADLESS_PROGRESS_CALLBACK, pre, post, close);
     }
 
     public enum Result {

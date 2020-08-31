@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.sandboxpowered.bootstrap.Constants;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
+import org.sandboxpowered.bootstrap.util.callback.ProgressCallback;
 import org.sandboxpowered.bootstrap.util.download.DownloadManager;
 import org.sandboxpowered.bootstrap.util.download.DownloadResult;
-import org.sandboxpowered.bootstrap.util.callback.ProgressCallback;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -61,7 +61,7 @@ public class SandboxUpdateChecker {
         @Nullable String v = nodes.item(0).getNodeValue();
         Version latest;
         try {
-            if(v == null) {
+            if (v == null) {
                 throw new VersionParsingException("null version");
             }
             latest = Version.parse(v);
@@ -112,7 +112,7 @@ public class SandboxUpdateChecker {
                         }
                     }
                     SandboxBootstrap.LOG.warn("Attempting to close Knot's parent ClassLoader, this may cause issues");
-                    if(!IOUtil.tryClose(FabricLauncherBase.getLauncher().getTargetClassLoader().getParent())) {
+                    if (!IOUtil.tryClose(FabricLauncherBase.getLauncher().getTargetClassLoader().getParent())) {
                         SandboxBootstrap.LOG.error("Unable to close ClassLoader: does not implement AutoCloseable!");
                         return AutoUpdate.Result.UNABLE_TO_DOWNLOAD;
                     }

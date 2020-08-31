@@ -1,6 +1,5 @@
 package org.sandboxpowered.bootstrap.util;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -8,7 +7,7 @@ public class IOUtil {
 
     public static boolean tryClose(Object... toClose) throws IOException {
         AutoCloseable[] array = Arrays.stream(toClose).filter(AutoCloseable.class::isInstance).map(AutoCloseable.class::cast).toArray(AutoCloseable[]::new);
-        if(array.length == 0) {
+        if (array.length == 0) {
             return false;
         }
         close(array);
@@ -18,7 +17,7 @@ public class IOUtil {
     public static void close(AutoCloseable... toClose) throws IOException {
         IOException parent = null;
         for (AutoCloseable closeable : toClose) {
-            if(closeable != null) {
+            if (closeable != null) {
                 try {
                     closeable.close();
                 } catch (Exception e) {
@@ -29,6 +28,6 @@ public class IOUtil {
                 }
             }
         }
-        if(parent != null) throw parent;
+        if (parent != null) throw parent;
     }
 }

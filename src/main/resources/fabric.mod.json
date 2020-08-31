@@ -18,6 +18,11 @@
     "modmenu:parent": "sandbox"
   },
   "environment": "*",
+  "entrypoints": {
+    "preLaunch": [
+      "org.sandboxpowered.bootstrap.AutoUpdate::onLaunch"
+    ]
+  },
   "mixins": [
     "sbx_bootstrap.mixins.json"
   ],

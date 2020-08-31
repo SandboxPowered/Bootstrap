@@ -22,11 +22,11 @@ public enum Edition {
         return getName();
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 }

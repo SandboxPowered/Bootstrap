@@ -12,15 +12,15 @@ public class DelegatingDownloadHandler implements DownloadHandler {
     private final PostDownloadCallback postDownloadCallback;
     private final CloseCallback closeCallback;
 
-    public static DelegatingDownloadHandler of(ProgressCallback progressCallback, PreDownloadCallback preDownloadCallback, PostDownloadCallback postDownloadCallback, CloseCallback closeCallback) {
-        return new DelegatingDownloadHandler(progressCallback, preDownloadCallback, postDownloadCallback, closeCallback);
-    }
-
     private DelegatingDownloadHandler(ProgressCallback progressCallback, PreDownloadCallback preDownloadCallback, PostDownloadCallback postDownloadCallback, CloseCallback closeCallback) {
         this.progressCallback = progressCallback;
         this.preDownloadCallback = preDownloadCallback;
         this.postDownloadCallback = postDownloadCallback;
         this.closeCallback = closeCallback;
+    }
+
+    public static DelegatingDownloadHandler of(ProgressCallback progressCallback, PreDownloadCallback preDownloadCallback, PostDownloadCallback postDownloadCallback, CloseCallback closeCallback) {
+        return new DelegatingDownloadHandler(progressCallback, preDownloadCallback, postDownloadCallback, closeCallback);
     }
 
     @Override

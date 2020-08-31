@@ -31,6 +31,16 @@ public class DownloadResult {
         return of(null, null, Type.FAIL);
     }
 
+    /**
+     * used to load class early so that mixin doesn't stall when loading it from another thread
+     * FIXME this looks like a mixin bug
+     * <p>
+     * DO NOT REMOVE OR THINGS WILL BREAK!
+     */
+    public static void init() {
+        Type.init();
+    }
+
     @Nullable
     public String getMessage() {
         return message;
@@ -56,15 +66,5 @@ public class DownloadResult {
         private static void init() {
             //NO-OP
         }
-    }
-
-    /**
-     * used to load class early so that mixin doesn't stall when loading it from another thread
-     * FIXME this looks like a mixin bug
-     *
-     * DO NOT REMOVE OR THINGS WILL BREAK!
-     */
-    public static void init() {
-        Type.init();
     }
 }

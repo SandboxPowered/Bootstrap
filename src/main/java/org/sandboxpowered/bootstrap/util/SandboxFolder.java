@@ -20,11 +20,10 @@ public class SandboxFolder {
 
     static {
         //noinspection deprecation
-        if(Constants.CUSTOM_SANDBOX_FOLDER_LOCATION != null) {
+        if (Constants.CUSTOM_SANDBOX_FOLDER_LOCATION != null) {
             //noinspection deprecation
             ROOT = Paths.get(Constants.CUSTOM_SANDBOX_FOLDER_LOCATION);
-        }
-        else {
+        } else {
             String homeStr = System.getProperty("user.home", ".");
             Path userHome;
             switch (Util.getOperatingSystem()) {

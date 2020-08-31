@@ -29,6 +29,12 @@ public class Constants {
     @Deprecated
     public static final String CUSTOM_SANDBOX_FOLDER_LOCATION = System.getProperty("sandbox.cache_location");
 
+    static {
+        if (FORCE_HEADLESS) {
+            SandboxBootstrap.LOG.info("Forcing headless installation mode!");
+        }
+    }
+
     private static int getInt(String name, IntSupplier defaultValueGetter) {
         return MoreObjects.firstNonNull(Integer.getInteger(name), defaultValueGetter.getAsInt());
     }
