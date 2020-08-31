@@ -15,26 +15,27 @@ public class GuiDownloadHandler implements DownloadHandler {
 
     private final JFrame window = new JFrame();
     private final JProgressBar progressBar = new JProgressBar(0, 4194304);
-    @Nullable private String headless;
+    @Nullable
+    private String wasHeadless;
 
     @Override
     public void onClose() {
         window.setVisible(false);
         window.dispose();
-        if (headless != null) {
-            System.setProperty("java.awt.headless", headless);
+        if (wasHeadless != null) {
+            System.setProperty("java.awt.headless", wasHeadless);
         }
     }
 
     @Override
     public void onFinishedDownloading() {
         //textLabel.setText("An update has been installed. Please restart your client to apply changes");
-        JOptionPane.showMessageDialog(window, "An update has been installed. Please restart your client to apply changes");
+        JOptionPane.showMessageDialog(window, "An update has been installed. Please restart your client to apply changes", "Sandbox", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
     public void onStartDownloading() {
-        headless = System.setProperty("java.awt.headless", "false");
+        wasHeadless = System.setProperty("java.awt.headless", "false");
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
