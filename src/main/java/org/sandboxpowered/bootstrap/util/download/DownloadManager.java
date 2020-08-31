@@ -1,7 +1,9 @@
 package org.sandboxpowered.bootstrap.util.download;
 
 import org.apache.commons.io.IOUtils;
+import org.sandboxpowered.bootstrap.Constants;
 import org.sandboxpowered.bootstrap.util.SandboxFolder;
+import org.sandboxpowered.bootstrap.util.callback.ProgressCallback;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -22,15 +24,7 @@ import java.util.concurrent.Executors;
 //TODO hash verification
 public class DownloadManager {
 
-    /**
-     * the maximum amount of downloads that should be running in parallel
-     */
-    private static final int MAX_CONNECTIONS = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
-    /**
-     * the size of each connection's download buffer, in {@code bytes}
-     */
-    private static final int DOWNLOAD_BUFFER_SIZE = 1024;
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(MAX_CONNECTIONS, r -> {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Constants.MAX_CONNECTIONS, r -> {
         Thread t = new Thread(r, "Sandbox Bootstrap/Download");
         t.setDaemon(true);
         return t;
@@ -54,12 +48,12 @@ public class DownloadManager {
                 URLConnection httpConnection = source.openConnection();
                 long bytesTotal = httpConnection.getContentLength();
                 progressCallback.accept(0, bytesTotal, ProgressCallback.Stage.PREPARING);
-                try (BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream(), DOWNLOAD_BUFFER_SIZE); BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(temp), DOWNLOAD_BUFFER_SIZE)) {
-                    byte[] data = new byte[DOWNLOAD_BUFFER_SIZE];
+                try (BufferedInputStream inputStream = new BufferedInputStream(httpConnection.getInputStream(), Constants.DOWNLOAD_BUFFER_SIZE); BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(temp), Constants.DOWNLOAD_BUFFER_SIZE)) {
+                    byte[] data = new byte[Constants.DOWNLOAD_BUFFER_SIZE];
                     long bytesDownloaded = 0;
 
                     //TODO maybe change buffer size to make the progress bar smoother? or make it configurable?
-                    for (int i = inputStream.read(data, 0, DOWNLOAD_BUFFER_SIZE); i >= 0; i = inputStream.read(data, 0, DOWNLOAD_BUFFER_SIZE)) {
+                    for (int i = inputStream.read(data, 0, Constants.DOWNLOAD_BUFFER_SIZE); i >= 0; i = inputStream.read(data, 0, Constants.DOWNLOAD_BUFFER_SIZE)) {
                         //Add data and update progress bar
                         bytesDownloaded += i;
                         progressCallback.accept(bytesDownloaded, bytesTotal, ProgressCallback.Stage.DOWNLOADING);

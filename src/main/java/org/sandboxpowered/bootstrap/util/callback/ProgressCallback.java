@@ -1,4 +1,4 @@
-package org.sandboxpowered.bootstrap.util.download;
+package org.sandboxpowered.bootstrap.util.callback;
 
 public interface ProgressCallback {
     /**

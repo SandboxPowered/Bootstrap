@@ -13,7 +13,7 @@ import org.sandboxpowered.bootstrap.AutoUpdate;
 import org.sandboxpowered.bootstrap.SandboxBootstrap;
 import org.sandboxpowered.bootstrap.util.download.DownloadManager;
 import org.sandboxpowered.bootstrap.util.download.DownloadResult;
-import org.sandboxpowered.bootstrap.util.download.ProgressCallback;
+import org.sandboxpowered.bootstrap.util.callback.ProgressCallback;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

@@ -2,9 +2,6 @@ package org.sandboxpowered.bootstrap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
-import org.sandboxpowered.bootstrap.util.SandboxUpdateChecker;
-import org.sandboxpowered.bootstrap.util.download.ProgressCallback;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
